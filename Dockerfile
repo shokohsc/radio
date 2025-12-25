@@ -1,16 +1,16 @@
-FROM node:20-alpine
+FROM node:22-alpine
 
 WORKDIR /app
 
-# Backend
-COPY backend ./backend
-RUN cd backend && npm install
+RUN apk add --no-cache ffmpeg
 
-# Frontend
-COPY frontend ./frontend
-RUN cd frontend && npm install && npm run build
+COPY src/server.js ./server.js
+COPY src/package.json ./package.json
+COPY src/index.html ./index.html
+
+RUN npm install
 
 ENV MUSIC_DIR=/music
-EXPOSE 3000
+EXPOSE 8000
 
-CMD ["node", "backend/server.js"]
+CMD ["node", "server.js"]

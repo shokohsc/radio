@@ -22,7 +22,7 @@ spec:
               memory: 64M
             limits:
               cpu: 1000m
-              memory: 256M
+              memory: 1024M
           volumeMounts:
             - name: wd-zarya
               mountPath: /music
@@ -30,4 +30,4 @@ spec:
         - name: wd-zarya
           nfs:
             server: nfs-wd-zarya.nfs-wd-zarya.svc.cluster.local
-            path: /music
+            path: /music/tracks

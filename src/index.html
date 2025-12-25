@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Radio Player</title>
+</head>
+<body>
+  <div class="radio">
+    <h2>Live Radio</h2>
+    <p>Now playing: {{ nowPlaying }}</p>
+
+    <audio
+      controls
+      autoplay
+      src="https://dev.radio.shokohsc.home/stream"
+    />
+  </div>
+
+  <script>
+    const AUDIO_URL = `${window.location.protocol}//${window.location.hostname}/stream`;
+    const CONTROL_URL = `${window.location.protocol}//${window.location.hostname}/control`;
+    const audioEl = document.getElementById('radio');
+    const statusEl = document.getElementById('status');
+
+    // Set stream source
+    audioEl.src = AUDIO_URL;
+
+    audioEl.addEventListener('playing', () => {
+      statusEl.textContent = 'Playing live stream...';
+    });
+
+    audioEl.addEventListener('error', (e) => {
+      console.error(e);
+      statusEl.textContent = 'Error loading stream.';
+    });
+
+    async function sendControl(action) {
+      try {
+        const response = await fetch(CONTROL_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action })
+        });
+        if (!response.ok) throw new Error('Request failed');
+        const result = await response.json();
+        statusEl.textContent = `Now playing: ${result.currentTrack}`;
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = 'Failed to send control command.';
+      }
+    }
+  </script>
+</body>
+</html>

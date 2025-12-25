@@ -8,11 +8,9 @@ build:
     context: .
     sync:
       manual:
-      - src: frontend/src/**/*.js
+      - src: src/*.js
         dest: .
-      - src: frontend/src/**/*.vue
-        dest: .
-      - src: backend/*.js
+      - src: src/*.html
         dest: .
     docker:
       dockerfile: Dockerfile
@@ -29,11 +27,9 @@ profiles:
     - image: shokohsc/radio
       sync:
         manual:
-        - src: frontend/src/**/*.js
+        - src: src/*.js
           dest: .
-        - src: frontend/src/**/*.vue
-          dest: .
-        - src: backend/*.js
+        - src: src/*.html
           dest: .
 - name: shokohsc
   build:
@@ -41,11 +37,9 @@ profiles:
     - image: shokohsc/radio
       sync:
         manual:
-        - src: frontend/src/**/*.js
+        - src: src/*.js
           dest: .
-        - src: frontend/src/**/*.vue
-          dest: .
-        - src: backend/*.js
+        - src: src/*.html
           dest: .
       kaniko:
         useNewRun: true

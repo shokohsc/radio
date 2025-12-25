@@ -24,7 +24,7 @@ spec:
               value: "false"
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 8000
               protocol: TCP
           startupProbe:
             tcpSocket:
@@ -35,7 +35,7 @@ spec:
           readinessProbe:
             httpGet:
               port: http
-              path: /
+              path: /health
           resources:
             requests:
               cpu: 10m
