@@ -1,0 +1,69 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: preview
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: ca-cluster-issuer
+    dashboard.shokohsc.home/name: preview-radio
+    dashboard.shokohsc.home/url: https://preview.radio.shokohsc.home
+    dashboard.shokohsc.home/icon: wrench
+spec:
+  rules:
+  - host: preview.radio.shokohsc.home
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: browser-sync
+            port:
+              number: 3000
+      - path: /browser-sync/socket.io
+        pathType: ImplementationSpecific # Does not trigger warning
+        # pathType: Prefix
+        backend:
+          service:
+            name: browser-sync
+            port:
+              number: 443
+  tls:
+  - hosts:
+    - preview.radio.shokohsc.home
+    secretName: preview-cert
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: browser-sync
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: ca-cluster-issuer
+    dashboard.shokohsc.home/name: browser-sync-radio
+    dashboard.shokohsc.home/url: https://browser-sync.radio.shokohsc.home
+    dashboard.shokohsc.home/icon: wrench
+spec:
+  rules:
+  - host: browser-sync.radio.shokohsc.home
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: browser-sync
+            port:
+              number: 3001
+      - path: /browser-sync
+        pathType: Prefix
+        backend:
+          service:
+            name: browser-sync
+            port:
+              number: 443
+  tls:
+  - hosts:
+    - browser-sync.radio.shokohsc.home
+    secretName: browser-sync-cert
