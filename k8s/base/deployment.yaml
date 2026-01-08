@@ -2,26 +2,24 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: radio
+  name: radio-server
 spec:
   selector:
     matchLabels:
-      app: radio
+      app: radio-server
   template:
     metadata:
       labels:
-        app: radio
+        app: radio-server
     spec:
       securityContext:
         fsGroup: 1000
       containers:
-        - name: radio
-          image: shokohsc/radio
+        - name: radio-server
+          image: shokohsc/radio-server
           env:
             - name: ENV
               value: production
-            - name: USE_SENTRY
-              value: "false"
           ports:
             - name: http
               containerPort: 8000
@@ -36,6 +34,44 @@ spec:
             httpGet:
               port: http
               path: /health
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64M
+            limits:
+              cpu: 100m
+              memory: 64M
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: radio-ui
+spec:
+  selector:
+    matchLabels:
+      app: radio-ui
+  template:
+    metadata:
+      labels:
+        app: radio-ui
+    spec:
+      containers:
+        - name: radio-ui
+          image: shokohsc/radio-ui
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          startupProbe:
+            tcpSocket:
+              port: http
+          livenessProbe:
+            tcpSocket:
+              port: http
+          readinessProbe:
+            httpGet:
+              port: http
+              path: /
           resources:
             requests:
               cpu: 10m

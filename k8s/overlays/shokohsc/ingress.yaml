@@ -9,6 +9,10 @@ metadata:
     dashboard.shokohsc.home/name: dev-radio
     dashboard.shokohsc.home/url: https://dev.radio.shokohsc.home/
     dashboard.shokohsc.home/icon: wrench
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
 spec:
   rules:
   - host: dev.radio.shokohsc.home
@@ -18,7 +22,35 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: radio
+            name: radio-ui
+            port:
+              number: 80
+      - path: /stream
+        pathType: Prefix
+        backend:
+          service:
+            name: radio-server
+            port:
+              number: 80
+      - path: /now-playing
+        pathType: Prefix
+        backend:
+          service:
+            name: radio-server
+            port:
+              number: 80
+      - path: /control
+        pathType: Prefix
+        backend:
+          service:
+            name: radio-server
+            port:
+              number: 80
+      - path: /health
+        pathType: Prefix
+        backend:
+          service:
+            name: radio-server
             port:
               number: 80
   tls:

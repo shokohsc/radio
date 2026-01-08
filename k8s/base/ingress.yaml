@@ -12,6 +12,34 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: radio
+            name: radio-ui
+            port:
+              number: 80
+      - path: /stream
+        pathType: Prefix
+        backend:
+          service:
+            name: radio-server
+            port:
+              number: 80
+      - path: /now-playing
+        pathType: Prefix
+        backend:
+          service:
+            name: radio-server
+            port:
+              number: 80
+      - path: /control
+        pathType: Prefix
+        backend:
+          service:
+            name: radio-server
+            port:
+              number: 80
+      - path: /health
+        pathType: Prefix
+        backend:
+          service:
+            name: radio-server
             port:
               number: 80

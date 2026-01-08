@@ -21,7 +21,7 @@ module.exports = {
   watch: false,
   https: false,
   proxy: {
-    target: "radio.dev-radio:80",
+    target: "radio-ui.dev-radio:80",
     ws: true
   },
   cors: true,

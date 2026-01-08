@@ -2,13 +2,44 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: radio
+  name: radio-server
 spec:
   template:
     spec:
       containers:
-        - name: radio
-          image: shokohsc/radio
+        - name: radio-server
+          image: shokohsc/radio-server
+          env:
+            - name: ENV
+              value: development
+            - name: MUSIC_DIR
+              value: /music
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64M
+            limits:
+              cpu: 1000m
+              memory: 2048M
+          volumeMounts:
+            - name: wd-zarya
+              mountPath: /music
+      volumes:
+        - name: wd-zarya
+          nfs:
+            server: nfs-wd-zarya.nfs-wd-zarya.svc.cluster.local
+            path: /music/tracks
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: radio-ui
+spec:
+  template:
+    spec:
+      containers:
+        - name: radio-ui
+          image: shokohsc/radio-ui
           env:
             - name: ENV
               value: development
@@ -21,13 +52,5 @@ spec:
               cpu: 10m
               memory: 64M
             limits:
-              cpu: 1000m
-              memory: 1024M
-          volumeMounts:
-            - name: wd-zarya
-              mountPath: /music
-      volumes:
-        - name: wd-zarya
-          nfs:
-            server: nfs-wd-zarya.nfs-wd-zarya.svc.cluster.local
-            path: /music/tracks
+              cpu: 100m
+              memory: 64M

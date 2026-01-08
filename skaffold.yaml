@@ -4,13 +4,23 @@ metadata:
   name: radio
 build:
   artifacts:
-  - image: shokohsc/radio
+  - image: shokohsc/radio-server
     context: .
     sync:
       manual:
-      - src: src/*.js
+      - src: server.js
         dest: .
-      - src: src/*.html
+    docker:
+      dockerfile: Dockerfile
+  - image: shokohsc/radio-ui
+    context: ./frontend
+    sync:
+      manual:
+      - src: frontend/src/main.js
+        dest: .
+      - src: frontend/src/App.vue
+        dest: .
+      - src: frontend/index.html
         dest: .
     docker:
       dockerfile: Dockerfile
@@ -24,27 +34,50 @@ profiles:
   - command: dev
   build:
     artifacts:
-    - image: shokohsc/radio
+    - image: shokohsc/radio-server
+      context: .
       sync:
         manual:
-        - src: src/*.js
+        - src: server.js
           dest: .
-        - src: src/*.html
+    - image: shokohsc/radio-ui
+      context: ./frontend
+      sync:
+        manual:
+        - src: frontend/src/main.js
+          dest: .
+        - src: frontend/src/App.vue
+          dest: .
+        - src: frontend/index.html
           dest: .
 - name: shokohsc
   build:
     artifacts:
-    - image: shokohsc/radio
+    - image: shokohsc/radio-server
+      context: .
       sync:
         manual:
-        - src: src/*.js
-          dest: .
-        - src: src/*.html
+        - src: server.js
           dest: .
       kaniko:
         useNewRun: true
         cache:
-          repo: shokohsc/radio
+          repo: shokohsc/radio-server
+        dockerfile: Dockerfile
+    - image: shokohsc/radio-ui
+      context: ./frontend
+      sync:
+        manual:
+        - src: frontend/src/main.js
+          dest: .
+        - src: frontend/src/App.vue
+          dest: .
+        - src: frontend/index.html
+          dest: .
+      kaniko:
+        useNewRun: true
+        cache:
+          repo: shokohsc/radio-ui
         dockerfile: Dockerfile
     cluster:
       dockerConfig:
@@ -65,11 +98,19 @@ profiles:
 - name: prod
   build:
     artifacts:
-    - image: shokohsc/radio
+    - image: shokohsc/radio-server
+      context: .
       kaniko:
         useNewRun: true
         cache:
-          repo: shokohsc/radio
+          repo: shokohsc/radio-server
+        dockerfile: Dockerfile
+    - image: shokohsc/radio-ui
+      context: ./frontend
+      kaniko:
+        useNewRun: true
+        cache:
+          repo: shokohsc/radio-ui
         dockerfile: Dockerfile
         buildArgs:
           POD_NAME: '{{.GIT_COMMIT}}'
