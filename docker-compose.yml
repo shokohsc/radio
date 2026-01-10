@@ -13,6 +13,7 @@ services:
     environment:
       - PORT=8000
       - MUSIC_DIR=/app/music
+      - NODE_OPTIONS="--trace-warnings"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:8000/health"]

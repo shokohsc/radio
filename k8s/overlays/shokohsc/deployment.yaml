@@ -14,13 +14,11 @@ spec:
               value: development
             - name: MUSIC_DIR
               value: /music
+            - name: NODE_OPTIONS
+              value: "--trace-warnings"
           resources:
-            requests:
-              cpu: 10m
-              memory: 64M
             limits:
-              cpu: 1000m
-              memory: 2048M
+              cpu: 250m
           volumeMounts:
             - name: wd-zarya
               mountPath: /music
@@ -47,10 +45,3 @@ spec:
               value: "true"
             - name: SENTRY_DSN
               value: https://2f15ffed2e254ced911e78de9312afe0\@glitchtip.shokohsc.home/1
-          resources:
-            requests:
-              cpu: 10m
-              memory: 64M
-            limits:
-              cpu: 100m
-              memory: 64M

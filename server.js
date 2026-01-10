@@ -58,33 +58,32 @@ function loadPlaylist() {
 // up, and resumes when that client signals ‘drain’.
 function broadcastChunk(chunk) {
   for (const res of clients) {
-    // Write to the socket – it returns false if the internal buffer is full.
     const ok = res.write(chunk);
 
-    res.on('error', () => clients.delete(res));
-    if (!ok) {
+    if (!ok && ffmpeg) {
       // Pause ffmpeg output until the socket drains.
       ffmpeg.stdout.pause();
 
-      // Resume ffmpeg once the socket is ready again.
-      res.once('drain', () => {
+      const drainListener = () => {
         ffmpeg.stdout.resume();
-      });
+        res.removeListener('drain', drainListener);
+      };
+      res.once('drain', drainListener);
 
-      // Once we hit *any* back‑pressure, we only need to resume once.
-      // The `once` above guarantees we resume only once per pause.
+      // Stop sending more chunks until one client drains.
       break;
     }
   }
 }
 
-function playCurrent(signal = 'SIGKILL') {
+function playCurrent() {
   if (paused || playlist.length === 0) return;
 
-  stopFFmpeg(signal);
+  stopFFmpeg();
 
   const trackPath = playlist[currentIndex];
   currentTrack = path.basename(trackPath);
+  console.log(`🎵 Playing ${currentTrack} from ${trackPath}`);
 
   ffmpeg = spawn('ffmpeg', [
     '-loglevel', 'error',
@@ -120,9 +119,9 @@ function playCurrent(signal = 'SIGKILL') {
 });
 }
 
-function stopFFmpeg(signal = 'SIGKILL') {
+function stopFFmpeg() {
   if (ffmpeg) {
-    ffmpeg.kill(signal);
+    ffmpeg.kill('SIGKILL');
     ffmpeg = null;
   }
 }
@@ -133,14 +132,18 @@ app.get('/stream', (req, res) => {
     'Content-Type': 'audio/mpeg',
     'icy-name': 'Node Web Radio',
     'Cache-Control': 'no-cache',
-    'Connection': 'keep-alive'
+    'Connection': 'keep-alive',
+    'Transfer-Encoding': 'chunked'
   });
+
+  // <-- register listeners only once
+  res.once('error', e => {
+    console.error('response error:', e);
+    clients.delete(res)
+  });
+  res.on('close', () => clients.delete(res));
 
   clients.add(res);
-
-  req.on('close', () => {
-    clients.delete(res);
-  });
 });
 
 /* ---------- Metadata ---------- */
