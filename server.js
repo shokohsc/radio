@@ -54,6 +54,30 @@ function loadPlaylist() {
 
 /* ---------- Playback ---------- */
 
+// A tiny helper that pauses the ffmpeg stream when any client can’t keep
+// up, and resumes when that client signals ‘drain’.
+function broadcastChunk(chunk) {
+  for (const res of clients) {
+    // Write to the socket – it returns false if the internal buffer is full.
+    const ok = res.write(chunk);
+
+    res.on('error', () => clients.delete(res));
+    if (!ok) {
+      // Pause ffmpeg output until the socket drains.
+      ffmpeg.stdout.pause();
+
+      // Resume ffmpeg once the socket is ready again.
+      res.once('drain', () => {
+        ffmpeg.stdout.resume();
+      });
+
+      // Once we hit *any* back‑pressure, we only need to resume once.
+      // The `once` above guarantees we resume only once per pause.
+      break;
+    }
+  }
+}
+
 function playCurrent(signal = 'SIGKILL') {
   if (paused || playlist.length === 0) return;
 
@@ -73,11 +97,7 @@ function playCurrent(signal = 'SIGKILL') {
     'pipe:1'
   ]);
 
-  ffmpeg.stdout.on('data', chunk => {
-    for (const res of clients) {
-      res.write(chunk);
-    }
-  });
+  ffmpeg.stdout.on('data', broadcastChunk);
 
   ffmpeg.once('close', () => {
     if (skipPending) {        // Check flag

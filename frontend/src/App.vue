@@ -28,7 +28,7 @@
       </div>
 
       <div class="footer">
-        <span>👥 {{ listeners }} listeners</span>
+        <span>👥 {{ listeners }} listener(s)</span>
       </div>
     </div>
   </div>
