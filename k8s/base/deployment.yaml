@@ -20,11 +20,14 @@ spec:
           env:
             - name: ENV
               value: production
+            - name: NODE_OPTIONS
+              value: "--trace-warnings"
           ports:
             - name: http
               containerPort: 8000
               protocol: TCP
           startupProbe:
+            initialDelaySeconds: 360
             tcpSocket:
               port: http
           livenessProbe:
@@ -36,11 +39,11 @@ spec:
               path: /health
           resources:
             requests:
-              cpu: 10m
-              memory: 64M
-            limits:
               cpu: 100m
-              memory: 64M
+              memory: 128M
+            limits:
+              cpu: 1000m
+              memory: 128M
 ---
 kind: Deployment
 apiVersion: apps/v1

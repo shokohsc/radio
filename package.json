@@ -5,6 +5,7 @@
     "start": "node server.js"
   },
   "dependencies": {
+    "@fridgefm/radio-core": "^3.3.0",
     "express": "^4.19.2"
   }
 }

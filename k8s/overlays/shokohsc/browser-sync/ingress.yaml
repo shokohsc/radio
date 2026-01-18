@@ -29,9 +29,28 @@ spec:
             name: browser-sync
             port:
               number: 443
+  - host: api.preview.radio.shokohsc.home
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: browser-sync
+            port:
+              number: 3000
+      - path: /browser-sync/socket.io
+        pathType: ImplementationSpecific # Does not trigger warning
+        # pathType: Prefix
+        backend:
+          service:
+            name: browser-sync
+            port:
+              number: 443
   tls:
   - hosts:
     - preview.radio.shokohsc.home
+    - api.preview.radio.shokohsc.home
     secretName: preview-cert
 ---
 apiVersion: networking.k8s.io/v1
