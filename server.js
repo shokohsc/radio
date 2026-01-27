@@ -84,7 +84,10 @@ function playCurrent() {
 
   const trackPath = playlist[currentIndex];
   const tags = NodeID3.read(trackPath)
-  currentTrack = `${tags.artist} - ${tags.title}`;
+  currentTrack = {
+    artist: tags.artist,
+    title: tags.title
+  };
   console.log(`🎵 Playing ${tags.artist} - ${tags.title} from ${trackPath}`);
 
   ffmpeg = spawn('ffmpeg', [

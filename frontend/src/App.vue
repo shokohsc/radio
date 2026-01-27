@@ -11,7 +11,7 @@
 
       <div class="now-playing">
         <span class="label">Now playing</span>
-        <span class="track" :title="track">{{ track || '—' }}</span>
+        <span class="track" :title="track">{{ song || '—' }}</span>
       </div>
 
       <audio
@@ -37,7 +37,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 
 const API = `${window.location.protocol}//api.${window.location.hostname}`;
 const STREAM_URI = `${API}/`;
@@ -45,11 +45,36 @@ const STREAM_URI = `${API}/`;
 const track = ref('');
 const listeners = ref(0);
 
+const song = computed(() => {
+  return `${track.value.artist} - ${track.value.title}`
+})
+
 async function refresh() {
   const res = await fetch(`${API}/now-playing`);
   const data = await res.json();
   track.value = data.track;
   listeners.value = data.listeners;
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: track.value.title,
+      artist: track.value.artist
+    });
+  }
+}
+
+async function initMediaSession() {
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.setActionHandler('play', async () => { await this.resume() });
+    navigator.mediaSession.setActionHandler('pause', async () => { await this.pause() });
+    navigator.mediaSession.setActionHandler('previoustrack', async () => {
+      await this.skip();
+      await refresh();
+    });
+    navigator.mediaSession.setActionHandler('nexttrack', async () => {
+      await this.skip();
+      await refresh();
+    });
+  }
 }
 
 async function skip() {
@@ -99,6 +124,7 @@ function createRipple(event) {
 onMounted(() => {
   refresh();
   setInterval(refresh, 4000);
+  initMediaSession();
 });
 </script>
 
