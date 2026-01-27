@@ -154,16 +154,24 @@ app.get('/', (req, res) => {
 /* ---------- Metadata ---------- */
 app.get('/now-playing', (_, res) => {
   res.json({
-    track: currentTrack,
+    song: currentTrack,
+    file: playlist[currentIndex],
     paused,
     listeners: clients.size
   });
 });
 
 /* ---------- Controls ---------- */
-app.post('/skip', (_, res) => {
+app.post('/forward', (_, res) => {
   skipPending = true;                 // tell the handler to ignore its own close
   currentIndex = (currentIndex + 1) % playlist.length;
+  playCurrent();
+  res.sendStatus(204);
+});
+
+app.post('/backward', (_, res) => {
+  skipPending = true;                 // tell the handler to ignore its own close
+  currentIndex = (currentIndex - 1) % playlist.length;
   playCurrent();
   res.sendStatus(204);
 });

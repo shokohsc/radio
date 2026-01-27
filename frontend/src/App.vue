@@ -11,7 +11,7 @@
 
       <div class="now-playing">
         <span class="label">Now playing</span>
-        <span class="track" :title="track">{{ song || '—' }}</span>
+        <span class="track" :title="song">{{ track }}</span>
       </div>
 
       <audio
@@ -24,7 +24,8 @@
       />
 
       <div class="controls">
-        <button class="btn" @click="createRipple($event); skip()">⏭ Skip</button>
+        <button class="btn" @click="createRipple($event); backward()">⏮ Prev</button>
+        <button class="btn" @click="createRipple($event); forward()">⏭ Next</button>
         <button class="btn" @click="createRipple($event); pause()">⏸ Pause</button>
         <button class="btn primary" @click="createRipple($event); resume()">▶ Resume</button>
       </div>
@@ -42,43 +43,51 @@ import { ref, onMounted, computed } from 'vue';
 const API = `${window.location.protocol}//api.${window.location.hostname}`;
 const STREAM_URI = `${API}/`;
 
-const track = ref('');
+const song = ref('');
+const file = ref('');
 const listeners = ref(0);
 
-const song = computed(() => {
-  return `${track.value.artist} - ${track.value.title}`
+const track = computed(() => {
+  if (song.value.artist && song.value.title)
+    return `${song.value.artist} - ${song.value.title}`
+  return file.value
 })
 
 async function refresh() {
   const res = await fetch(`${API}/now-playing`);
   const data = await res.json();
-  track.value = data.track;
+  song.value = data.song;
+  file.value = data.file;
   listeners.value = data.listeners;
   if ('mediaSession' in navigator) {
     navigator.mediaSession.metadata = new MediaMetadata({
-      title: track.value.title,
-      artist: track.value.artist
+      title: song.value.title,
+      artist: song.value.artist
     });
   }
 }
 
 async function initMediaSession() {
   if ('mediaSession' in navigator) {
-    navigator.mediaSession.setActionHandler('play', async () => { await this.resume() });
-    navigator.mediaSession.setActionHandler('pause', async () => { await this.pause() });
+    navigator.mediaSession.setActionHandler('play', async () => { await resume() });
+    navigator.mediaSession.setActionHandler('pause', async () => { await pause() });
     navigator.mediaSession.setActionHandler('previoustrack', async () => {
-      await this.skip();
+      await backward();
       await refresh();
     });
     navigator.mediaSession.setActionHandler('nexttrack', async () => {
-      await this.skip();
+      await forward();
       await refresh();
     });
   }
 }
 
-async function skip() {
-  await fetch(`${API}/skip`, { method: 'POST' });
+async function forward() {
+  await fetch(`${API}/forward`, { method: 'POST' });
+}
+
+async function backward() {
+  await fetch(`${API}/backward`, { method: 'POST' });
 }
 
 async function pause() {
@@ -160,7 +169,7 @@ body {
 
 .card {
   width: 100%;
-  max-width: 420px;
+  max-width: 680px;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 16px;
@@ -226,7 +235,7 @@ audio {
 /* Controls */
 .controls {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 0.5rem;
 }
 
