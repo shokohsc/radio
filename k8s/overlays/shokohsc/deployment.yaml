@@ -9,24 +9,33 @@ spec:
       containers:
         - name: radio-server
           image: shokohsc/radio-server
+          args:
+            - /app/server.js
           env:
             - name: ENV
               value: development
             - name: MUSIC_DIR
-              value: /music
+              value: /app/music
             - name: NODE_OPTIONS
               value: "--trace-warnings"
-          resources:
-            limits:
-              cpu: 250m
           volumeMounts:
             - name: wd-zarya
-              mountPath: /music
+              mountPath: /app/music
       volumes:
         - name: wd-zarya
           nfs:
             server: nfs-wd-zarya.nfs-wd-zarya.svc.cluster.local
             path: /music/tracks
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: NotIn
+                values:
+                - zarya
 ---
 kind: Deployment
 apiVersion: apps/v1

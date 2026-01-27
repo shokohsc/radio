@@ -15,28 +15,10 @@ spec:
             name: radio-ui
             port:
               number: 80
-      - path: /stream
-        pathType: Prefix
-        backend:
-          service:
-            name: radio-server
-            port:
-              number: 80
-      - path: /now-playing
-        pathType: Prefix
-        backend:
-          service:
-            name: radio-server
-            port:
-              number: 80
-      - path: /control
-        pathType: Prefix
-        backend:
-          service:
-            name: radio-server
-            port:
-              number: 80
-      - path: /health
+  - host: api.radio.cluster.local
+    http:
+      paths:
+      - path: /
         pathType: Prefix
         backend:
           service:

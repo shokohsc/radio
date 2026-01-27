@@ -2,6 +2,7 @@ import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import { spawn } from 'child_process';
+import NodeID3 from 'node-id3';
 
 const app = express();
 app.use(express.json());
@@ -82,8 +83,9 @@ function playCurrent() {
   stopFFmpeg();
 
   const trackPath = playlist[currentIndex];
-  currentTrack = path.basename(trackPath);
-  console.log(`🎵 Playing ${currentTrack} from ${trackPath}`);
+  const tags = NodeID3.read(trackPath)
+  currentTrack = `${tags.artist} - ${tags.title}`;
+  console.log(`🎵 Playing ${tags.artist} - ${tags.title} from ${trackPath}`);
 
   ffmpeg = spawn('ffmpeg', [
     '-loglevel', 'error',
@@ -127,7 +129,7 @@ function stopFFmpeg() {
 }
 
 /* ---------- HTTP Stream ---------- */
-app.get('/stream', (req, res) => {
+app.get('/', (req, res) => {
   res.writeHead(200, {
     'Content-Type': 'audio/mpeg',
     'icy-name': 'Node Web Radio',
@@ -156,20 +158,20 @@ app.get('/now-playing', (_, res) => {
 });
 
 /* ---------- Controls ---------- */
-app.post('/control/skip', (_, res) => {
+app.post('/skip', (_, res) => {
   skipPending = true;                 // tell the handler to ignore its own close
   currentIndex = (currentIndex + 1) % playlist.length;
   playCurrent();
   res.sendStatus(204);
 });
 
-app.post('/control/pause', (_, res) => {
+app.post('/pause', (_, res) => {
   paused = true;
   stopFFmpeg();
   res.sendStatus(204);
 });
 
-app.post('/control/resume', (_, res) => {
+app.post('/resume', (_, res) => {
   if (!paused) return res.sendStatus(204);
   paused = false;
   playCurrent();
@@ -177,7 +179,6 @@ app.post('/control/resume', (_, res) => {
 });
 
 /* ---------- Kubernetes ---------- */
-app.get('/', (_, res) => res.send('OK'));
 app.get('/health', (_, res) => res.send('healthy'));
 
 const server = app.listen(PORT, () => {

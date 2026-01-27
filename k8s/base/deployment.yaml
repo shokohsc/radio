@@ -20,6 +20,8 @@ spec:
           env:
             - name: ENV
               value: production
+            - name: NODE_OPTIONS
+              value: "--trace-warnings"
           ports:
             - name: http
               containerPort: 8000
@@ -36,10 +38,10 @@ spec:
               path: /health
           resources:
             requests:
-              cpu: 10m
+              cpu: 100m
               memory: 64M
             limits:
-              cpu: 100m
+              cpu: 1000m
               memory: 64M
 ---
 kind: Deployment
