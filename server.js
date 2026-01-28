@@ -156,6 +156,10 @@ app.get('/now-playing', (_, res) => {
   res.json({
     song: currentTrack,
     file: playlist[currentIndex],
+    queue: {
+      previous: playlist[currentIndex - 1] ? path.basename(playlist[currentIndex - 1]) : 'undefined',
+      next: playlist[currentIndex + 1] ? path.basename(playlist[currentIndex + 1]) : 'undefined'
+    },
     paused,
     listeners: clients.size
   });

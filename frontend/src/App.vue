@@ -45,6 +45,7 @@ const STREAM_URI = `${API}/`;
 
 const song = ref('');
 const file = ref('');
+const queue = ref('');
 const listeners = ref(0);
 
 const track = computed(() => {
@@ -58,6 +59,7 @@ async function refresh() {
   const data = await res.json();
   song.value = data.song;
   file.value = data.file;
+  queue.value = data.queue;
   listeners.value = data.listeners;
   if ('mediaSession' in navigator) {
     navigator.mediaSession.metadata = new MediaMetadata({
