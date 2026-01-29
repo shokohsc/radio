@@ -77,18 +77,24 @@ function broadcastChunk(chunk) {
   }
 }
 
+function getSong(trackPath) {
+  const tags = NodeID3.read(trackPath)
+  return {
+    artist: tags.artist || undefined,
+    title: tags.title || undefined,
+    album: tags.album || undefined,
+    file: path.basename(trackPath)
+  };
+}
+
 function playCurrent() {
   if (paused || playlist.length === 0) return;
 
   stopFFmpeg();
 
   const trackPath = playlist[currentIndex];
-  const tags = NodeID3.read(trackPath)
-  currentTrack = {
-    artist: tags.artist,
-    title: tags.title
-  };
-  console.log(`🎵 Playing ${tags.artist} - ${tags.title} from ${trackPath}`);
+  currentTrack = getSong(trackPath);
+  console.log(`🎵 Playing ${currentTrack.title} by ${currentTrack.artist} from ${trackPath}`);
 
   ffmpeg = spawn('ffmpeg', [
     '-loglevel', 'error',
@@ -154,12 +160,9 @@ app.get('/', (req, res) => {
 /* ---------- Metadata ---------- */
 app.get('/now-playing', (_, res) => {
   res.json({
-    song: currentTrack,
-    file: playlist[currentIndex],
-    queue: {
-      previous: playlist[currentIndex - 1] ? path.basename(playlist[currentIndex - 1]) : 'undefined',
-      next: playlist[currentIndex + 1] ? path.basename(playlist[currentIndex + 1]) : 'undefined'
-    },
+    currentSong: currentTrack,
+    previousSong: playlist[currentIndex - 1] ? getSong(playlist[currentIndex - 1]) : 'undefined',
+    nextSong: playlist[currentIndex + 1] ? getSong(playlist[currentIndex + 1]) : 'undefined',
     paused,
     listeners: clients.size
   });

@@ -11,7 +11,8 @@
 
       <div class="now-playing">
         <span class="label">Now playing</span>
-        <span class="track" :title="song">{{ track }}</span>
+        <span class="track" :title="displaySong(currentSong)">{{ displaySong(currentSong) }}</span>
+        <span class="album" :title="album">Album: {{ currentSong.album || 'Unknown' }}</span>
       </div>
 
       <audio
@@ -30,6 +31,13 @@
         <button class="btn primary" @click="createRipple($event); resume()">▶ Resume</button>
       </div>
 
+      <div class="queue">
+        <span v-if="nextSong" class="label">Next song</span>
+        <span v-if="nextSong" class="track" :title="displaySong(nextSong)">{{ displaySong(nextSong) }}</span>
+        <span v-if="previousSong" class="label">Previous song</span>
+        <span v-if="previousSong" class="track" :title="displaySong(previousSong)">{{ displaySong(previousSong) }}</span>
+      </div>
+
       <div class="footer">
         <span>👥 {{ listeners }} listener(s)</span>
       </div>
@@ -38,33 +46,34 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 
 const API = `${window.location.protocol}//api.${window.location.hostname}`;
 const STREAM_URI = `${API}/`;
 
-const song = ref('');
-const file = ref('');
-const queue = ref('');
 const listeners = ref(0);
+const currentSong = ref('');
+const nextSong = ref('');
+const previousSong = ref('');
 
-const track = computed(() => {
-  if (song.value.artist && song.value.title)
-    return `${song.value.artist} - ${song.value.title}`
-  return file.value
-})
+function displaySong(s) {
+  if (s.artist && s.title)
+    return `${s.artist} - ${s.title}`
+  return s.file
+}
 
 async function refresh() {
   const res = await fetch(`${API}/now-playing`);
   const data = await res.json();
-  song.value = data.song;
-  file.value = data.file;
-  queue.value = data.queue;
   listeners.value = data.listeners;
+  currentSong.value = data.currentSong;
+  nextSong.value = data.nextSong;
+  previousSong.value = data.previousSong;
   if ('mediaSession' in navigator) {
     navigator.mediaSession.metadata = new MediaMetadata({
-      title: song.value.title,
-      artist: song.value.artist
+      title: currentSong.value.title,
+      artist: currentSong.value.artist,
+      album: currentSong.value.album
     });
   }
 }
@@ -171,7 +180,7 @@ body {
 
 .card {
   width: 100%;
-  max-width: 680px;
+  max-width: 480px;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 16px;
@@ -334,6 +343,31 @@ audio {
 
   .footer {
     font-size: 0.65rem;
+  }
+}
+/* Album */
+.album {
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Queue */
+.queue {
+  background: #0d1117;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.6rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .queue {
+    padding: 0.5rem 0.75rem;
   }
 }
 </style>
