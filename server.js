@@ -97,14 +97,17 @@ function playCurrent() {
   console.log(`🎵 Playing ${currentTrack.title} by ${currentTrack.artist} from ${trackPath}`);
 
   ffmpeg = spawn('ffmpeg', [
-    '-loglevel', 'error',
-    '-re',
-    '-i', trackPath,
-    '-vn',
-    '-acodec', 'libmp3lame',
-    '-ab', '128k',
-    '-f', 'mp3',
-    'pipe:1'
+    '-loglevel', 'error', // logging level
+    '-re', // read input at native frame rate
+    '-i', trackPath, // input file
+    '-vn', // disable video
+    '-acodec', 'libmp3lame', // audio codec
+    '-ab', '128k', // audio bitrate
+    '-f', 'mp3', // output format
+    '-metadata', `title=${currentTrack.title}`,
+    '-metadata', `artist=${currentTrack.artist}`,
+    '-metadata', `album=${currentTrack.album}`,
+    'pipe:1' // output to stdout
   ]);
 
   ffmpeg.stdout.on('data', broadcastChunk);
