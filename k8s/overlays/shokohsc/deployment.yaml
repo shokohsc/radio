@@ -10,7 +10,9 @@ spec:
         - name: radio-server
           image: shokohsc/radio-server
           args:
-            - /app/server.js
+            - npm
+            - run
+            - dev
           env:
             - name: ENV
               value: development
@@ -21,6 +23,9 @@ spec:
           volumeMounts:
             - name: wd-zarya
               mountPath: /app/music
+          resources:
+            limits:
+              memory: 1024M
       volumes:
         - name: wd-zarya
           nfs:
@@ -50,7 +55,7 @@ spec:
           env:
             - name: ENV
               value: development
-            - name: USE_SENTRY
-              value: "true"
-            - name: SENTRY_DSN
-              value: https://2f15ffed2e254ced911e78de9312afe0\@glitchtip.shokohsc.home/1
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 2048M

@@ -80,9 +80,9 @@ function broadcastChunk(chunk) {
 function getSong(trackPath) {
   const tags = NodeID3.read(trackPath)
   return {
-    artist: tags.artist || undefined,
-    title: tags.title || undefined,
-    album: tags.album || undefined,
+    artist: tags.artist || 'Unknown',
+    title: tags.title || 'Unknown',
+    album: tags.album || 'Unknown',
     file: path.basename(trackPath)
   };
 }
@@ -102,7 +102,7 @@ function playCurrent() {
     '-i', trackPath, // input file
     '-vn', // disable video
     '-acodec', 'libmp3lame', // audio codec
-    '-ab', '128k', // audio bitrate
+    '-ab', '192k', // audio bitrate
     '-f', 'mp3', // output format
     '-metadata', `title=${currentTrack.title}`,
     '-metadata', `artist=${currentTrack.artist}`,
@@ -113,6 +113,7 @@ function playCurrent() {
   ffmpeg.stdout.on('data', broadcastChunk);
 
   ffmpeg.once('close', () => {
+    console.log(`🎵 Closed ${currentTrack.title} by ${currentTrack.artist} from ${trackPath}`);
     if (skipPending) {        // Check flag
       skipPending = false;    // We already moved on
       return;                 // Exit early

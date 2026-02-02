@@ -8,22 +8,22 @@ build:
     context: .
     sync:
       manual:
-      - src: server.js
+      - src: index.js
         dest: .
     docker:
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
   - image: shokohsc/radio-ui
     context: ./frontend
     sync:
       manual:
-      - src: frontend/src/main.js
+      - src: src/main.js
         dest: .
-      - src: frontend/src/App.vue
+      - src: src/App.vue
         dest: .
-      - src: frontend/index.html
+      - src: index.html
         dest: .
     docker:
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
 deploy:
   kustomize:
     paths:
@@ -38,17 +38,17 @@ profiles:
       context: .
       sync:
         manual:
-        - src: server.js
+        - src: index.js
           dest: .
     - image: shokohsc/radio-ui
       context: ./frontend
       sync:
         manual:
-        - src: frontend/src/main.js
+        - src: src/main.js
           dest: .
-        - src: frontend/src/App.vue
+        - src: src/App.vue
           dest: .
-        - src: frontend/index.html
+        - src: index.html
           dest: .
 - name: shokohsc
   build:
@@ -57,28 +57,28 @@ profiles:
       context: .
       sync:
         manual:
-        - src: server.js
+        - src: index.js
           dest: .
       kaniko:
         useNewRun: true
         cache:
           repo: shokohsc/radio-server
-        dockerfile: Dockerfile
+        dockerfile: Dockerfile.dev
     - image: shokohsc/radio-ui
       context: ./frontend
       sync:
         manual:
-        - src: frontend/src/main.js
+        - src: src/main.js
           dest: .
-        - src: frontend/src/App.vue
+        - src: src/App.vue
           dest: .
-        - src: frontend/index.html
+        - src: index.html
           dest: .
       kaniko:
         useNewRun: true
         cache:
           repo: shokohsc/radio-ui
-        dockerfile: Dockerfile
+        dockerfile: Dockerfile.dev
     cluster:
       dockerConfig:
         secretName: kaniko-secret

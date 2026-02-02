@@ -12,7 +12,7 @@
       <div class="now-playing">
         <span class="label">Now playing</span>
         <span class="track" :title="displaySong(currentSong)">{{ displaySong(currentSong) }}</span>
-        <span class="album" :title="album">Album: {{ currentSong.album || 'Unknown' }}</span>
+        <span class="album" :title="album">Album: {{ currentSong.album }}</span>
       </div>
 
       <audio
