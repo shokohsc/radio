@@ -9,12 +9,17 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - /Users/dimitri/Downloads/compa:/app/music:ro
+      # WARNING: Change this path to your music directory
+      - ./music:/app/music:ro
     environment:
       - PORT=8000
       - MUSIC_DIR=/app/music
-      - NODE_OPTIONS="--trace-warnings"
+      - NODE_OPTIONS=--trace-warnings
     restart: unless-stopped
+    # Run as non-root user (UID 1000 is the radio user in the container)
+    user: radio
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:8000/health"]
       interval: 10s
@@ -27,7 +32,11 @@ services:
       dockerfile: Dockerfile
     container_name: web-radio-ui
     ports:
-      - "3000:80"
+      - "3000:8080"
     depends_on:
       - radio-server
     restart: unless-stopped
+    # Run as non-root user
+    user: nginx
+    security_opt:
+      - no-new-privileges:true

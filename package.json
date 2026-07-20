@@ -6,7 +6,9 @@
     "dev": "nodemon ./index.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
+    "express": "^4.22.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.1.0",
     "node-id3": "^0.2.9"
   },
   "devDependencies": {

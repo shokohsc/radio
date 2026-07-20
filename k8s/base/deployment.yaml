@@ -12,11 +12,29 @@ spec:
       labels:
         app: radio-server
     spec:
+      # Pod-level security context
       securityContext:
         fsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: radio-server
           image: shokohsc/radio-server
+          # Container-level security context
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
           env:
             - name: ENV
               value: production
@@ -57,9 +75,31 @@ spec:
       labels:
         app: radio-ui
     spec:
+      # Pod-level security context
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101  # nginx default user
+        runAsGroup: 101
+        fsGroup: 101
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: radio-ui
           image: shokohsc/radio-ui
+          # Container-level security context
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 101
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_BIND_SERVICE  # needed for binding to port 80
+            seccompProfile:
+              type: RuntimeDefault
           ports:
             - name: http
               containerPort: 80

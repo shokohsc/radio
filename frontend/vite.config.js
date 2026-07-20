@@ -4,7 +4,9 @@ import { fileURLToPath, URL } from "node:url";
 
 export default defineConfig({
   build: {
-    sourcemap: true, // Source map generation must be turned on
+    // Security: sourcemap generation is disabled in production to avoid
+    // exposing source code to end users. Enable only for debugging.
+    sourcemap: false,
   },
   plugins: [vue()],
   resolve: {

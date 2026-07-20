@@ -6,10 +6,12 @@ JSON_STRING='window.configs = { \
 }'
 
 if [[ $ENV == 'production' ]]; then
-  sed -i "s@// CONFIGURATIONS_PLACEHOLDER@${JSON_STRING}@" /usr/share/nginx/html/index.html && \
+  sed -i "s@// CONFIGURATIONS_PLACEHOLDER@${JSON_STRING}@" /usr/share/nginx/html/index.html
+  envsubst '${PORT}' < /etc/nginx/conf.d/default.conf > /tmp/default.conf \
+    && mv /tmp/default.conf /etc/nginx/conf.d/default.conf
   nginx -g 'daemon off;'
 else
-  echo "${JSON_STRING}" && \
-  sed -i "s@// CONFIGURATIONS_PLACEHOLDER@${JSON_STRING}@" /app/index.html && \
+  echo "${JSON_STRING}"
+  sed -i "s@// CONFIGURATIONS_PLACEHOLDER@${JSON_STRING}@" /app/index.html
   npm run $@
 fi
