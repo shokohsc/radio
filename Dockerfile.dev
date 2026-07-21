@@ -1,5 +1,5 @@
 # Use a specific Node.js version with a SHA256 digest for reproducibility
-FROM node:20-alpine@sha256:f84e50c98e4edc519a334152eede59ade84f9f4a09e62a2e0ef3649e6a23859c
+FROM node:20-alpine
 
 # Create a non-root user and group
 RUN addgroup -S radio && adduser -S radio -G radio

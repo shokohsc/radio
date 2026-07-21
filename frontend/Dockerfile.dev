@@ -1,5 +1,5 @@
 # build stage
-FROM node:20-alpine@sha256:f84e50c98e4edc519a334152eede59ade84f9f4a09e62a2e0ef3649e6a23859c AS build-stage
+FROM node:20-alpine AS build-stage
 WORKDIR /app
 COPY package*.json ./
 RUN apk add --no-cache bash gettext ca-certificates && \
