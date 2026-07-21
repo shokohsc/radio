@@ -11,7 +11,7 @@ RUN apk add --no-cache ffmpeg
 
 # Copy package.json and install dependencies first (better layer caching)
 COPY package.json package-lock.json* ./
-RUN npm ci --only=production && npm cache clean --force
+RUN npm install --omit=dev && npm cache clean --force
 
 # Copy application code
 COPY index.js .
