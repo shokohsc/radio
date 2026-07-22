@@ -20,6 +20,7 @@ WORKDIR /usr/share/nginx/html
 COPY --from=build-stage --chown=nginx:nginx /app/dist .
 
 ENV PORT=8080
+ENV ENV=production
 EXPOSE 8080
 
 USER nginx
