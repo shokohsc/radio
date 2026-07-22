@@ -9,20 +9,20 @@ RUN npm run build
 # production stage
 FROM nginx:stable-alpine
 
-RUN apk add --no-cache bash gettext \
-    && rm -rf /etc/nginx/conf.d/default.conf
+RUN apk add --no-cache gettext
 
-COPY ./default.conf /etc/nginx/conf.d/default.conf
+COPY ./nginx.conf /etc/nginx/nginx.conf
+COPY ./default.conf /etc/nginx/templates/default.conf
 COPY ./start-nginx.sh /usr/bin/start-nginx.sh
 RUN chmod +x /usr/bin/start-nginx.sh
 
 WORKDIR /usr/share/nginx/html
 COPY --from=build-stage --chown=nginx:nginx /app/dist .
 
-ENV PORT=8080
+ENV NGINX_PORT=8080
 ENV ENV=production
 EXPOSE 8080
 
 USER nginx
 
-ENTRYPOINT [ "start-nginx.sh" ]
+ENTRYPOINT ["start-nginx.sh"]
