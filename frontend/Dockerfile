@@ -9,7 +9,7 @@ RUN npm run build
 # production stage
 FROM nginx:stable-alpine
 
-RUN apk add --no-cache gettext \
+RUN apk add --no-cache bash gettext \
     && rm -rf /etc/nginx/conf.d/default.conf
 
 COPY ./default.conf /etc/nginx/conf.d/default.conf
