@@ -48,7 +48,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 
-const API = `${window.location.protocol}//api.${window.location.hostname}`;
+const API = `${window.location.protocol}//${window.location.hostname}/api`;
 const STREAM_URI = `${API}/`;
 
 const listeners = ref(0);
