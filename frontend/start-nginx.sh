@@ -1,11 +1,11 @@
-#!/usr/bin/env bash
+#!/bin/sh
 set -e
 
 JSON_STRING='window.configs = { \
   "ENV":"'"${ENV}"'" \
 }'
 
-if [[ $ENV == 'production' ]]; then
+if [ "$ENV" = "production" ]; then
   sed -i "s@// CONFIGURATIONS_PLACEHOLDER@${JSON_STRING}@" /usr/share/nginx/html/index.html
 fi
 
