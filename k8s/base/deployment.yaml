@@ -78,9 +78,9 @@ spec:
       # Pod-level security context
       securityContext:
         runAsNonRoot: true
-        runAsUser: 101  # nginx default user
-        runAsGroup: 101
-        fsGroup: 101
+        runAsUser: 100  # caddy user
+        runAsGroup: 100
+        fsGroup: 100
         seccompProfile:
           type: RuntimeDefault
       containers:
@@ -92,12 +92,10 @@ spec:
             privileged: false
             readOnlyRootFilesystem: true
             runAsNonRoot: true
-            runAsUser: 101
+            runAsUser: 100
             capabilities:
               drop:
                 - ALL
-              add:
-                - NET_BIND_SERVICE  # needed for binding to port 80
             seccompProfile:
               type: RuntimeDefault
           ports:

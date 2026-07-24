@@ -1,6 +1,6 @@
 # Node Web Radio
 
-An MP3 streaming radio server built with **Node.js** and **Express.js**. It reads MP3 files from a configurable directory, re-encodes them in real time using **ffmpeg**, and broadcasts the stream to multiple concurrent HTTP clients. A **Vue.js 3** frontend (served via Nginx) provides the user interface. The application is fully containerized with Docker and supports Kubernetes deployment via Kustomize.
+An MP3 streaming radio server built with **Node.js** and **Express.js**. It reads MP3 files from a configurable directory, re-encodes them in real time using **ffmpeg**, and broadcasts the stream to multiple concurrent HTTP clients. A **Vue.js 3** frontend (served via Caddy) provides the user interface. The application is fully containerized with Docker and supports Kubernetes deployment via Kustomize.
 
 ---
 
@@ -44,7 +44,7 @@ An MP3 streaming radio server built with **Node.js** and **Express.js**. It read
 
 ┌──────────────────────────────────────────────────────────┐
 │                    Frontend (Vue.js 3)                    │
-│             served by Nginx on port 80/3000              │
+│              served by Caddy on port 3000                 │
 └──────────────────────────────────────────────────────────┘
 ```
 
@@ -210,7 +210,7 @@ The `docker-compose.yml` file defines two services:
 | Service        | Container Name    | Port Mapping | Description                        |
 |----------------|-------------------|-------------|------------------------------------|
 | `radio-server` | `web-radio-server` | `8000:8000`  | Node.js radio server + ffmpeg      |
-| `radio-ui`     | `web-radio-ui`    | `3000:80`    | Nginx-hosted Vue.js frontend       |
+| `radio-ui`     | `web-radio-ui`    | `3000:8080`  | Caddy-hosted Vue.js frontend       |
 
 **Important:** Before running, update the volume mount under `radio-server` to point to your local music directory:
 
@@ -309,7 +309,7 @@ npm run dev     # Starts Vite dev server with hot module replacement
 npm run build   # Production build to dist/
 ```
 
-The frontend Dockerfile uses a multi-stage build: the first stage compiles the Vue app with Vite, and the second stage serves the static files via Nginx.
+The frontend Dockerfile uses a multi-stage build: the first stage compiles the Vue app with Vite, and the second stage serves the static files via Caddy.
 
 ### Project Layout
 
@@ -324,7 +324,7 @@ The frontend Dockerfile uses a multi-stage build: the first stage compiles the V
 └── frontend/             # Vue.js 3 web UI
     ├── Dockerfile
     ├── Dockerfile.dev
-    ├── default.conf       # Nginx server configuration
+    ├── Caddyfile         # Caddy server configuration
     └── vite.config.js
 ```
 

@@ -7,22 +7,23 @@ COPY . .
 RUN npm run build
 
 # production stage
-FROM nginx:stable-alpine
+FROM caddy:2-alpine
 
-RUN apk add --no-cache gettext
+RUN addgroup -g 100 caddy && adduser -u 100 -G caddy -s /bin/sh -D caddy
 
-COPY ./nginx.conf /etc/nginx/nginx.conf
-COPY ./default.conf /etc/nginx/templates/default.conf
-COPY ./start-nginx.sh /usr/bin/start-nginx.sh
-RUN chmod +x /usr/bin/start-nginx.sh
+COPY ./Caddyfile /etc/caddy/Caddyfile
+COPY ./start-caddy.sh /usr/bin/start-caddy.sh
+RUN chmod +x /usr/bin/start-caddy.sh
 
-WORKDIR /usr/share/nginx/html
-COPY --from=build-stage --chown=nginx:nginx /app/dist .
+WORKDIR /usr/share/caddy
+COPY --from=build-stage /app/dist .
+
+RUN mkdir -p /var/cache/caddy && chown -R caddy:caddy /var/cache/caddy /usr/share/caddy /etc/caddy
 
 ENV NGINX_PORT=8080
 ENV ENV=production
 EXPOSE 8080
 
-USER nginx
+USER caddy
 
-ENTRYPOINT ["start-nginx.sh"]
+ENTRYPOINT ["start-caddy.sh"]

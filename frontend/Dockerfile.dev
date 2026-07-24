@@ -6,13 +6,13 @@ RUN apk add --no-cache bash gettext ca-certificates && \
     npm ci && npm cache clean --force
 COPY . .
 
-COPY ./start-nginx.sh /usr/bin/start-nginx.sh
-RUN chmod +x /usr/bin/start-nginx.sh
+COPY ./start-caddy.sh /usr/bin/start-caddy.sh
+RUN chmod +x /usr/bin/start-caddy.sh
 
 # Create non-root user for dev
 RUN addgroup -S radio && adduser -S radio -G radio && \
-    chown -R radio:radio /app /usr/bin/start-nginx.sh
+    chown -R radio:radio /app /usr/bin/start-caddy.sh
 USER radio
 
-ENTRYPOINT [ "start-nginx.sh" ]
+ENTRYPOINT [ "start-caddy.sh" ]
 CMD ["dev"]

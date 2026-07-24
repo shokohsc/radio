@@ -36,15 +36,15 @@
 - Max 100 concurrent streaming clients (`MAX_CLIENTS = 100`).
 - ID3 metadata is sanitized via `sanitizeMetadata()` before passing to ffmpeg `-metadata` args.
 - Dockerfiles pin `node:20-alpine` with SHA256 digest, run as non-root `radio` user.
-- Frontend Nginx config sets CSP that allows `connect-src 'self' https://api.*` — frontend expects to call an `api.*` subdomain.
-- `start-nginx.sh` does runtime env injection (substitutes `// CONFIGURATIONS_PLACEHOLDER` in index.html).
+- Frontend Caddy config sets CSP that allows `connect-src 'self' https://api.*` — frontend expects to call an `api.*` subdomain.
+- `start-caddy.sh` does runtime env injection (substitutes `// CONFIGURATIONS_PLACEHOLDER` in index.html).
 - **skaffold.yaml prod profile** (`/workspace/skaffold.yaml:117`) contains a hardcoded Sentry auth token — treat as sensitive, do not commit to public repos.
 
 ## Docker Compose
 
 - Two services: `radio-server` (port 8000) and `radio-ui` (port 3000 → 80).
 - Radio server mounts `./music:/app/music:ro` — change the host path to your music directory.
-- Both run as non-root (`user: radio` / `user: nginx`), `no-new-privileges:true`.
+- Both run as non-root (`user: radio` / `user: caddy`), `no-new-privileges:true`.
 
 ## K8s Details
 

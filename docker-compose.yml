@@ -37,6 +37,6 @@ services:
       - radio-server
     restart: unless-stopped
     # Run as non-root user
-    user: nginx
+    user: caddy
     security_opt:
       - no-new-privileges:true
