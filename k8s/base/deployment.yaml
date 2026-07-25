@@ -78,9 +78,9 @@ spec:
       # Pod-level security context
       securityContext:
         runAsNonRoot: true
-        runAsUser: 100  # caddy user
-        runAsGroup: 100
-        fsGroup: 100
+        runAsUser: 1000  # caddy user
+        runAsGroup: 1000
+        fsGroup: 1000
         seccompProfile:
           type: RuntimeDefault
       containers:
@@ -92,7 +92,7 @@ spec:
             privileged: false
             readOnlyRootFilesystem: true
             runAsNonRoot: true
-            runAsUser: 100
+            runAsUser: 1000
             capabilities:
               drop:
                 - ALL

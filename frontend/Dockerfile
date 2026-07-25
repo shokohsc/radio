@@ -9,8 +9,6 @@ RUN npm run build
 # production stage
 FROM caddy:2-alpine
 
-RUN addgroup -g 100 caddy && adduser -u 100 -G caddy -s /bin/sh -D caddy
-
 COPY ./Caddyfile /etc/caddy/Caddyfile
 COPY ./start-caddy.sh /usr/bin/start-caddy.sh
 RUN chmod +x /usr/bin/start-caddy.sh
