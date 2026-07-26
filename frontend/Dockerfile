@@ -16,7 +16,8 @@ RUN chmod +x /usr/bin/start-caddy.sh
 WORKDIR /usr/share/caddy
 COPY --from=build-stage /app/dist .
 
-RUN mkdir -p /var/cache/caddy && chown -R caddy:caddy /var/cache/caddy /usr/share/caddy /etc/caddy
+RUN addgroup -S caddy 2>/dev/null; adduser -S -G caddy caddy 2>/dev/null; \
+    mkdir -p /var/cache/caddy && chown -R caddy:caddy /var/cache/caddy /usr/share/caddy /etc/caddy
 
 ENV NGINX_PORT=8080
 ENV ENV=production
